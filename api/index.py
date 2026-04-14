@@ -9,7 +9,7 @@ app = Flask(__name__, template_folder='../templates')
 CORS(app)
 
 # Vercel 프로젝트 설정의 Environment Variables에 GEMINI_API_KEY를 반드시 등록해야 합니다.
-API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyC-CgzFK8oJbFZnN8y62t3A0j7i4p5jac0") 
+API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyBvWaYwsZLgYm3pgUOHhpCRBY4kzCn9fI8") 
 
 # [수정] 404 에러 해결을 위해 모델명을 최신 버전인 'gemini-1.5-flash-latest'로 변경합니다.
 MODEL_NAME = "gemini-1.5-flash-latest"
