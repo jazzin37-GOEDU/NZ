@@ -114,18 +114,21 @@
         .article-section {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-        }
-        .lang-block {
-            display: flex;
-            flex-direction: column;
+            gap: 20px;
         }
         .article-content {
             font-size: 1.15rem;
             line-height: 1.9;
             text-align: justify;
             white-space: pre-wrap;
-            min-height: 150px;
+            min-height: 50px;
+        }
+        .translated-text {
+            color: #444;
+            font-style: italic;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            margin-top: 5px;
         }
 
         /* 국기 표시 스타일 */
@@ -206,12 +209,14 @@
                 <img id="previewImg" class="hidden">
             </div>
 
-            <!-- 본문 영역 (교체 방식 + 국기 표시) -->
+            <!-- 본문 영역 (원문 유지 + 번역문 추가 방식) -->
             <div class="article-section">
-                <!-- 국기 표시용 요소 추가 -->
                 <div id="flagDisplay" class="flex justify-start"></div>
                 <div class="lang-block">
+                    <!-- 원문이 표시될 영역 -->
                     <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. 입력 언어에 따라 국기가 표시됩니다." class="article-content"></div>
+                    <!-- 번역문이 별도로 표시될 영역 -->
+                    <div id="translatedOutput" class="article-content translated-text hidden"></div>
                 </div>
             </div>
 
@@ -265,6 +270,7 @@
         // 입력 시 실시간 국기 업데이트
         document.getElementById('mainContentInput').addEventListener('input', function(e) {
             updateFlag(e.target.innerText);
+            // 새로운 입력이 들어오면 기존 번역 영역은 초기화하거나 숨길 수 있습니다.
         });
 
         // 사진 핸들러
@@ -298,10 +304,11 @@
             }
         }
 
-        // 통합 번역 및 배치 로직 (교체 방식 + 국기 동기화)
+        // 통합 번역 및 배치 로직 (원문 유지 + 번역문 추가)
         async function startTranslation() {
             const titleInput = document.getElementById('mainTitleInput');
             const contentInput = document.getElementById('mainContentInput');
+            const translatedOutput = document.getElementById('translatedOutput');
             
             const titleText = titleInput.innerText.trim();
             const contentText = contentInput.innerText.trim();
@@ -320,12 +327,11 @@
                     }));
                 }
 
-                // 본문 번역 및 교체
+                // 본문 번역 (원문은 그대로 두고 아래에 번역문 표시)
                 if (contentText) {
                     tasks.push(requestTranslation(contentText).then(res => {
-                        contentInput.innerText = res;
-                        // 번역된 텍스트의 언어에 맞춰 국기도 업데이트
-                        updateFlag(res);
+                        translatedOutput.innerText = res;
+                        translatedOutput.classList.remove('hidden');
                     }));
                 }
                 
