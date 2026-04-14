@@ -8,48 +8,63 @@ from flask_cors import CORS
 app = Flask(__name__, template_folder='../templates')
 CORS(app)
 
-# Vercel 프로젝트 설정의 Environment Variables에 GEMINI_API_KEY를 반드시 등록해야 합니다.
-API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyBvWaYwsZLgYm3pgUOHhpCRBY4kzCn9fI8") 
+# Vercel 프로젝트 설정의 Environment Variables에 DEEPL_API_KEY를 등록하세요.
+# DeepL Free API 키는 보통 끝에 :fx가 붙습니다.
+DEEPL_API_KEY = os.environ.get("DEEPL_API_KEY", "")
 
-# [수정] 404 에러 해결을 위해 모델명을 최신 버전인 'gemini-1.5-flash-latest'로 변경합니다.
-MODEL_NAME = "gemini-1.5-flash-latest"
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_NAME}:generateContent?key={API_KEY}"
+# DeepL API 엔드포인트 (무료 버전은 api-free.deepl.com, 유료 버전은 api.deepl.com 사용)
+DEEPL_URL = "https://api-free.deepl.com/v2/translate"
 
-def translate_with_gemini(text):
-    if not API_KEY:
-        return "Error: API Key is missing on the server side."
+def translate_with_deepl(text):
+    if not DEEPL_API_KEY:
+        return "Error: DeepL API Key is missing. Please set DEEPL_API_KEY in Vercel."
 
-    # 신문 제작에 최적화된 프롬프트 구성
-    prompt = f"""Translate the following text for a school exchange newspaper. 
-    If the input is Korean, translate to English. If the input is English, translate to Korean.
-    Maintain a friendly and educational tone. 
-    Keep the output as plain text only.
+    # DeepL API 파라미터 설정
+    # source_lang은 생략 시 자동 감지되지만, 명시적으로 지정할 수도 있습니다.
+    # target_lang은 필수이며 'KO' 또는 'EN-US' 등을 사용합니다.
     
-    Text: {text}"""
-    
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}]
+    # 텍스트가 한글이 포함되어 있는지 간단히 체크하여 목적 언어 결정
+    import re
+    is_korean = bool(re.search('[가-힣]', text))
+    target_lang = 'EN-US' if is_korean else 'KO'
+
+    data = {
+        'auth_key': DEEPL_API_KEY,
+        'text': text,
+        'target_lang': target_lang
     }
-    
-    # 지수 백오프(Exponential Backoff)를 사용하여 안정성 강화
+
+    # 지수 백오프(Exponential Backoff) 적용
     for i in range(5):
         try:
-            response = requests.post(API_URL, json=payload, timeout=30)
+            response = requests.post(DEEPL_URL, data=data, timeout=30)
+            
             if response.status_code == 200:
                 result = response.json()
-                return result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', "").strip()
-            elif response.status_code == 429: # Rate limit reached
+                try:
+                    # DeepL 응답은 translations 리스트 안에 담겨 옵니다.
+                    return result['translations'][0]['text'].strip()
+                except (KeyError, IndexError):
+                    return "Error: DeepL returned an unexpected format."
+            
+            elif response.status_code == 403:
+                return "Error 403: Invalid DeepL API Key. Check if it's the Free or Pro key."
+            
+            elif response.status_code == 429: # Too many requests
                 time.sleep(2**i)
-            elif response.status_code == 404: # 모델명을 찾을 수 없는 경우
-                return f"API Error 404: Model '{MODEL_NAME}' not found. Please verify the model name and API version."
+            
+            elif response.status_code == 456: # Quota exceeded
+                return "Error 456: DeepL API Quota exceeded."
+            
             else:
-                return f"API Error: {response.status_code} - {response.text}"
+                return f"DeepL API Error {response.status_code}: {response.text}"
+                
         except Exception as e:
-            if i == 4: # 마지막 시도에서도 실패하면 에러 메시지 반환
+            if i == 4:
                 return f"Connection Error: {str(e)}"
             time.sleep(2**i)
             
-    return "Translation service is currently busy. Please try again later."
+    return "DeepL service is currently busy. Please try again later."
 
 @app.route('/')
 def index():
@@ -62,7 +77,7 @@ def handle_translate():
         return jsonify({"error": "No text provided"}), 400
         
     source_text = data.get('text', '')
-    translated_text = translate_with_gemini(source_text)
+    translated_text = translate_with_deepl(source_text)
     return jsonify({"translatedText": translated_text})
 
 # Vercel은 이 app 객체를 자동으로 실행합니다.
