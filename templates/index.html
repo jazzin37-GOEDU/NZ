@@ -88,6 +88,9 @@
             color: #444;
             font-style: italic;
             min-height: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
         }
 
         /* 이미지 섹션 */
@@ -114,18 +117,25 @@
         .article-section {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-        .lang-block {
-            display: flex;
-            flex-direction: column;
         }
         .article-content {
             font-size: 1.15rem;
             line-height: 1.9;
             text-align: justify;
             white-space: pre-wrap;
-            min-height: 150px;
+            min-height: 100px;
+        }
+        /* 번역된 본문 스타일 */
+        #displayTranslatedContent {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            font-style: italic;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            text-align: justify;
+            white-space: pre-wrap;
         }
 
         /* 버튼 및 로딩 */
@@ -147,6 +157,17 @@
             justify-content: center;
             z-index: 100;
             backdrop-filter: blur(4px);
+        }
+
+        /* 제출 안내 모달 */
+        #submissionModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
         
         @media print {
@@ -185,8 +206,8 @@
             <!-- 제목 영역 -->
             <div class="title-section">
                 <div id="mainTitleInput" contenteditable="true" data-placeholder="제목을 입력하세요, Enter Title" class="focus:ring-0"></div>
-                <!-- 제목 번역은 아래에 작게 표시되어 디자인적 완성도를 유지합니다 -->
-                <div id="displayTranslatedTitle" class="italic"></div>
+                <!-- 제목 번역 결과 표시 -->
+                <div id="displayTranslatedTitle"></div>
             </div>
 
             <!-- 사진 영역 -->
@@ -200,11 +221,12 @@
                 <img id="previewImg" class="hidden">
             </div>
 
-            <!-- 본문 영역 (교체 방식) -->
+            <!-- 본문 영역 -->
             <div class="article-section">
-                <div class="lang-block">
-                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. '자동번역' 버튼을 누르면 이 내용이 번역된 텍스트로 바뀝니다." class="article-content"></div>
-                </div>
+                <!-- 원문 본문 -->
+                <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. '자동번역' 버튼을 누르면 이 내용 아래에 번역본이 생성됩니다." class="article-content"></div>
+                <!-- 번역 본문 결과 표시 -->
+                <div id="displayTranslatedContent" class="hidden"></div>
             </div>
 
             <!-- 푸터 -->
@@ -218,10 +240,22 @@
         <!-- 하단 액션 버튼 -->
         <div class="flex flex-col sm:flex-row justify-center gap-6 no-print pb-20 px-4">
             <button onclick="startTranslation()" class="btn-action bg-white border-2 border-black text-black hover:bg-black hover:text-white shadow-xl w-full sm:w-auto justify-center">
-                <span class="text-xl">🔄</span> 자동번역, Translate
+                <span class="text-xl">🔄</span> 자동번역 (Translate)
             </button>
-            <button onclick="saveAsImage()" class="btn-action bg-black text-white hover:bg-gray-800 shadow-xl w-full sm:w-auto justify-center">
-                <span class="text-xl">💾</span> 신문 이미지 저장하기, Save as Image
+            <button onclick="handleSaveAndSubmit()" class="btn-action bg-black text-white hover:bg-gray-800 shadow-xl w-full sm:w-auto justify-center">
+                <span class="text-xl">💾</span> 신문 이미지 저장 및 제출하기
+            </button>
+        </div>
+    </div>
+
+    <!-- 제출 안내 모달 -->
+    <div id="submissionModal" class="no-print">
+        <div class="bg-white p-8 rounded-2xl max-w-md w-full mx-4 text-center border-4 border-black shadow-2xl">
+            <div class="text-5xl mb-4">🖼️</div>
+            <h3 class="text-2xl font-bold mb-2">기사가 이미지로 저장되었습니다!</h3>
+            <p class="text-gray-600 mb-6">아래 버튼을 누르면 제목이 자동으로 입력된<br><strong>구글 사이트 게시판(설문지)</strong>으로 연결됩니다.</p>
+            <button onclick="redirectToGoogle()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition text-lg shadow-lg">
+                게시판 이동 (제목 자동입력)
             </button>
         </div>
     </div>
@@ -247,7 +281,7 @@
             }
         });
 
-        // 번역 API
+        // 번역 API 호출
         async function requestTranslation(text) {
             try {
                 const response = await fetch("/translate", {
@@ -262,10 +296,11 @@
             }
         }
 
-        // 통합 번역 및 배치 로직 (교체 방식)
+        // 통합 번역 로직 (원문 유지 + 번역문 하단 추가)
         async function startTranslation() {
             const titleInput = document.getElementById('mainTitleInput');
             const contentInput = document.getElementById('mainContentInput');
+            const transContentArea = document.getElementById('displayTranslatedContent');
             
             const titleText = titleInput.innerText.trim();
             const contentText = contentInput.innerText.trim();
@@ -277,17 +312,18 @@
             try {
                 const tasks = [];
                 
-                // 제목 번역 (입력창 내용은 그대로 두고 아래 가이드 텍스트만 업데이트하거나 교체 가능)
+                // 제목 번역 (입력창 아래 이탈릭 텍스트 영역에 결과 표시)
                 if (titleText) {
                     tasks.push(requestTranslation(titleText).then(res => {
                         document.getElementById('displayTranslatedTitle').innerText = res;
                     }));
                 }
 
-                // 본문 번역 (기존 내용을 번역된 내용으로 교체)
+                // 본문 번역 (기존 입력창은 그대로 두고, 그 아래 transContentArea에 결과 표시)
                 if (contentText) {
                     tasks.push(requestTranslation(contentText).then(res => {
-                        contentInput.innerText = res;
+                        transContentArea.innerText = res;
+                        transContentArea.classList.remove('hidden');
                     }));
                 }
                 
@@ -297,8 +333,8 @@
             }
         }
 
-        // 이미지 저장
-        function saveAsImage() {
+        // 이미지 저장 및 모달 표시
+        function handleSaveAndSubmit() {
             const elementsToHide = document.querySelectorAll('.no-print');
             elementsToHide.forEach(el => el.style.display = 'none');
 
@@ -309,11 +345,24 @@
                 useCORS: true 
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `ExchangeNews_${new Date().getTime()}.png`;
+                const title = document.getElementById('mainTitleInput').innerText.trim() || 'ExchangeNews';
+                link.download = `${title}_${new Date().getTime()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+                
                 elementsToHide.forEach(el => el.style.display = '');
+                document.getElementById('submissionModal').style.display = 'flex';
             });
+        }
+
+        function redirectToGoogle() {
+            const title = document.getElementById('mainTitleInput').innerText.trim();
+            const formBaseUrl = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform";
+            const entryId = "entry.123456789"; 
+
+            const finalUrl = `${formBaseUrl}?usp=pp_url&${entryId}=${encodeURIComponent(title)}`;
+            window.open(finalUrl, '_blank');
+            document.getElementById('submissionModal').style.display = 'none';
         }
     </script>
 </body>
