@@ -11,8 +11,8 @@ CORS(app)
 # Vercel 프로젝트 설정의 Environment Variables에 GEMINI_API_KEY를 반드시 등록해야 합니다.
 API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyC-CgzFK8oJbFZnN8y62t3A0j7i4p5jac0") 
 
-# [수정] 404 에러 해결을 위해 모델명을 안정적인 버전으로 변경합니다.
-MODEL_NAME = "gemini-1.5-flash"
+# [수정] 404 에러 해결을 위해 모델명을 최신 버전인 'gemini-1.5-flash-latest'로 변경합니다.
+MODEL_NAME = "gemini-1.5-flash-latest"
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_NAME}:generateContent?key={API_KEY}"
 
 def translate_with_gemini(text):
@@ -41,7 +41,7 @@ def translate_with_gemini(text):
             elif response.status_code == 429: # Rate limit reached
                 time.sleep(2**i)
             elif response.status_code == 404: # 모델명을 찾을 수 없는 경우
-                return "API Error 404: The specified model was not found. Please check the model name."
+                return f"API Error 404: Model '{MODEL_NAME}' not found. Please verify the model name and API version."
             else:
                 return f"API Error: {response.status_code} - {response.text}"
         except Exception as e:
