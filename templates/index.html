@@ -6,238 +6,366 @@
     <title>Gyeonggi - NZ International Exchange News</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #f3f4f6;
-            font-family: 'Nanum Gothic', 'Inter', sans-serif;
+            background-color: #e5e7eb;
+            font-family: 'Nanum Gothic', sans-serif;
         }
+        /* 신문 용지 질감 및 스타일 */
         .newspaper-container {
-            background-color: #fdfbf7;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 40px;
-            border: 1px solid #d1d1d1;
+            background-color: #f9f7f2;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 50px;
+            border: 1px solid #c1b9a8;
             position: relative;
+            color: #1a1a1a;
         }
+        /* 헤더 섹션 */
         .newspaper-header {
-            border-bottom: 4px double #333;
-            margin-bottom: 20px;
             text-align: center;
+            border-bottom: 5px solid #1a1a1a;
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+        }
+        .main-title {
+            font-family: 'Nanum Myeongjo', serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            margin-bottom: 5px;
         }
         .newspaper-meta {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid #333;
-            padding: 5px 0;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        .headline-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
             align-items: center;
+            border-bottom: 2px solid #1a1a1a;
+            padding: 8px 5px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+        /* 제목 입력 섹션 */
+        .title-section {
+            margin-bottom: 30px;
+            text-align: center;
         }
         .headline-input {
             width: 100%;
             background: transparent;
             border: none;
-            border-bottom: 1px dashed #ccc;
             text-align: center;
+            font-family: 'Nanum Myeongjo', serif;
             font-weight: 800;
-            font-family: 'Nanum Gothic', sans-serif;
-            letter-spacing: -1px;
-            padding: 10px 0;
             outline: none;
+            padding-bottom: 10px;
+            font-size: 2.2rem;
+            border-bottom: 1px solid #ccc;
         }
-        .headline-input:focus::placeholder, .content-textarea:focus::placeholder {
-            color: transparent;
+        .translated-headline {
+            margin-top: 10px;
+            font-family: 'Nanum Myeongjo', serif;
+            font-size: 1.6rem;
+            color: #444;
+            font-style: italic;
+            min-height: 1.8rem;
         }
-        #titleKr { font-size: 1.8rem; color: #000; }
-        #titleEn { font-size: 1.4rem; color: #4b5563; }
+
+        /* 이미지 섹션 */
         .image-placeholder {
-            width: 100%; aspect-ratio: 16 / 9;
-            background-color: #eee; border: 2px dashed #bbb;
-            display: flex; align-items: center; justify-content: center;
-            flex-direction: column; cursor: pointer; overflow: hidden;
-            margin-bottom: 20px; transition: background-color 0.2s;
+            width: 100%;
+            min-height: 200px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+            overflow: hidden;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
         }
-        .image-placeholder:hover { background-color: #e5e5e5; }
-        .image-placeholder img { width: 100%; height: 100%; object-fit: cover; }
-        .article-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .image-placeholder img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* 본문 영역 스타일 (통합형) */
+        .article-section {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
         .content-textarea {
-            width: 100%; min-height: 220px; background: transparent;
-            border: 1px solid transparent; line-height: 1.7; resize: none;
-            padding: 5px; font-family: 'Nanum Gothic', sans-serif;
-            font-size: 1rem; outline: none;
+            width: 100%;
+            min-height: 150px;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            line-height: 1.6;
+            resize: vertical;
+            font-size: 1rem;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
-        .btn-action { padding: 10px 20px; border-radius: 5px; font-weight: bold; transition: all 0.2s; }
+        .display-content-box {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .lang-block {
+            position: relative;
+        }
+        .lang-label {
+            font-family: 'Nanum Myeongjo', serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #555;
+            border-bottom: 1px solid #1a1a1a;
+            margin-bottom: 10px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        .article-text {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            text-align: justify;
+            white-space: pre-wrap;
+            color: #1a1a1a;
+        }
+        .article-text.english {
+            font-style: normal;
+        }
+
+        /* 버튼 및 로딩 */
+        .btn-action {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .loading-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.7); display: none;
-            align-items: center; justify-content: center; z-index: 50;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(2px);
         }
-        .bottom-actions { max-width: 800px; margin: 0 auto 40px auto; display: flex; justify-content: center; gap: 15px; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .newspaper-container { margin: 0; box-shadow: none; border: none; width: 100%; padding: 30px; }
+            .content-textarea { display: none; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="max-w-4xl mx-auto p-5 space-y-4">
-        <input type="file" id="imageInput" accept="image/*" class="hidden">
-
+    <div class="max-w-5xl mx-auto p-6 space-y-6">
+        <!-- 신문 본체 -->
         <div id="newspaper" class="newspaper-container">
             <div id="loading" class="loading-overlay">
                 <div class="text-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-                    <p class="mt-2 font-bold">서버에서 번역 중입니다...</p>
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-black mx-auto"></div>
+                    <p class="mt-4 font-extrabold text-xl">기사를 번역하고 있습니다...</p>
+                    <p class="text-gray-500">Connecting to AI Server</p>
                 </div>
             </div>
 
+            <!-- 신문 헤더 -->
             <div class="newspaper-header">
-                <h1 class="text-4xl font-extrabold mb-2 tracking-tight">경기초등학교 - 뉴질랜드학교 국제교류 신문</h1>
-                <p class="text-lg font-medium text-gray-600 pb-2">Gyeonggi Elementary School - New Zealand School Exchange News</p>
+                <div class="text-sm font-bold tracking-widest mb-1">INTERNATIONAL CULTURAL EXCHANGE</div>
+                <h1 class="main-title">Gyeonggi &middot; New Zealand<br>Exchange News</h1>
             </div>
 
+            <!-- 메타 정보 -->
             <div class="newspaper-meta">
-                <div id="currentDate">Date: 2026. 04. 14</div>
-                <div>편집처: 경기초등학교-뉴질랜드학교 (Edited by: Gyeonggi-NZ Team)</div>
+                <div id="currentDate">Vol. 1 - 2026. 04. 14</div>
+                <div class="text-center italic">Friendship Through Education</div>
+                <div class="text-right">경기초등학교 - NZ School</div>
             </div>
 
-            <div class="headline-container">
-                <div>
-                    <input type="text" id="titleKr" class="headline-input" placeholder="제목을 입력하세요" onfocus="this.placeholder=''" onblur="this.placeholder='제목을 입력하세요'">
-                    <div class="text-center text-xs text-gray-400 mt-1 font-bold">[한국어 제목]</div>
-                </div>
-                <div>
-                    <input type="text" id="titleEn" class="headline-input" placeholder="English Title" onfocus="this.placeholder=''" onblur="this.placeholder='English Title'">
-                    <div class="text-center text-xs text-gray-400 mt-1 font-bold">[영어 제목]</div>
-                </div>
+            <!-- 제목 영역 -->
+            <div class="title-section">
+                <input type="text" id="mainTitleInput" class="headline-input no-print" placeholder="제목을 입력하세요 / Enter Title Here" />
+                <div id="displayTranslatedTitle" class="translated-headline"></div>
             </div>
 
+            <!-- 사진 영역 -->
+            <input type="file" id="imageInput" accept="image/*" class="hidden">
             <div class="image-placeholder" id="imageContainer" onclick="document.getElementById('imageInput').click()">
-                <div id="emptyStateText" class="text-center text-gray-400">
-                    <span class="text-4xl">📸</span>
-                    <p class="font-bold mt-2">사진 추가 (Click to upload)</p>
+                <div id="emptyStateText" class="text-center p-10">
+                    <div class="text-5xl mb-3">🖼️</div>
+                    <p class="font-bold text-gray-500">교류 활동 사진을 추가해 주세요 (클릭)</p>
+                    <p class="text-xs text-gray-400 mt-1">Upload an image of your exchange activity</p>
                 </div>
                 <img id="previewImg" class="hidden">
             </div>
 
-            <div class="article-content">
-                <div class="lang-section border-r border-gray-200">
-                    <h3 class="font-extrabold border-b-2 border-black mb-3 pb-1">🇰🇷 한글 (Korean)</h3>
-                    <textarea id="textKr" class="content-textarea" placeholder="내용을 입력하세요." onfocus="this.placeholder=''" onblur="this.placeholder='내용을 입력하세요.'"></textarea>
-                </div>
-                <div class="lang-section">
-                    <h3 class="font-extrabold border-b-2 border-black mb-3 pb-1">🇳🇿 영어 (English)</h3>
-                    <textarea id="textEn" class="content-textarea" placeholder="English translation..." onfocus="this.placeholder=''" onblur="this.placeholder='English translation...'"></textarea>
+            <!-- 본문 통합 영역 -->
+            <div class="article-section">
+                <textarea id="mainContentInput" class="content-textarea no-print" placeholder="기사 내용을 입력하세요 (한글 또는 영어 모두 가능) / Enter article content here..."></textarea>
+                
+                <div class="display-content-box">
+                    <!-- 한국어 출력 블록 -->
+                    <div id="blockKr" class="lang-block hidden">
+                        <div class="lang-label">Korean Article</div>
+                        <div id="displayTextKr" class="article-text"></div>
+                    </div>
+                    
+                    <!-- 영어 출력 블록 -->
+                    <div id="blockEn" class="lang-block hidden">
+                        <div class="lang-label">English Article</div>
+                        <div id="displayTextEn" class="article-text english"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-8 pt-4 border-t border-gray-300 text-center text-sm text-gray-500 font-bold">
-                &copy; 2026 Gyeonggi-NZ International Exchange Program
+            <!-- 푸터 -->
+            <div class="mt-12 pt-6 border-t-2 border-black flex justify-between items-center text-xs font-bold uppercase tracking-widest">
+                <div>Gyeonggi-NZ Partnership</div>
+                <div>Page 01</div>
+                <div>Est. 2026</div>
             </div>
         </div>
 
-        <div class="bottom-actions no-print">
-            <button onclick="startTranslation()" class="bg-green-600 text-white btn-action hover:bg-green-700 shadow-md">🔄 자동 번역</button>
-            <button onclick="saveAsImage()" class="bg-purple-600 text-white btn-action hover:bg-purple-700 shadow-md">💾 이미지 저장</button>
+        <!-- 하단 액션 버튼 -->
+        <div class="flex justify-center gap-4 no-print pb-10">
+            <button onclick="startTranslation()" class="btn-action bg-white border-2 border-black text-black hover:bg-black hover:text-white shadow-lg">
+                <span>🔄</span> 자동 번역 (Auto Translate)
+            </button>
+            <button onclick="saveAsImage()" class="btn-action bg-black text-white hover:bg-gray-800 shadow-lg">
+                <span>💾</span> 이미지로 저장하기 (Save Image)
+            </button>
         </div>
     </div>
 
     <script>
-        // 날짜 설정
+        // 현재 날짜 설정
         const d = new Date();
-        document.getElementById('currentDate').innerText = `Date: ${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}`;
+        const dateStr = `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}`;
+        document.getElementById('currentDate').innerText = `Vol. 1 - ${dateStr}`;
 
-        // 이미지 로드
+        // 사진 업로드 핸들러
         document.getElementById('imageInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
-                    document.getElementById('previewImg').src = ev.target.result;
-                    document.getElementById('previewImg').classList.remove('hidden');
+                    const img = document.getElementById('previewImg');
+                    img.src = ev.target.result;
+                    img.classList.remove('hidden');
                     document.getElementById('emptyStateText').classList.add('hidden');
+                    const container = document.getElementById('imageContainer');
+                    container.style.height = 'auto';
+                    container.style.backgroundColor = 'transparent';
+                    container.style.border = 'none';
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // 파이썬 서버로 번역 요청을 보내는 함수 (경로 연동 보완)
+        // 번역 API 호출 함수
         async function requestTranslation(text) {
-            // 서버 주소를 명시적으로 확인 (서버가 로컬 혹은 배포 환경인지에 따라 대응)
-            // Flask에서 서빙되는 경우 루트로부터의 상대 경로를 사용하는 것이 가장 안전합니다.
-            const endpoint = "/translate";
-            
             try {
-                const response = await fetch(endpoint, {
+                const response = await fetch("/translate", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: text })
                 });
-                
-                if (response.status === 404) {
-                    throw new Error('서버의 번역 경로(/translate)를 찾을 수 없습니다. app.py가 실행 중인지 확인하세요.');
-                }
-                
-                if (!response.ok) {
-                    const errorMsg = await response.text();
-                    throw new Error(`서버 응답 오류: ${response.status} - ${errorMsg}`);
-                }
-                
+                if (!response.ok) throw new Error('Network error');
                 const data = await response.json();
                 return data.translatedText;
             } catch (err) {
-                console.error("Translation failed:", err);
-                return `오류: ${err.message}`;
+                console.error(err);
+                return "Translation Failed";
             }
         }
 
+        // 언어 판별 함수 (한글 포함 여부)
+        function containsKorean(text) {
+            return /[가-힣]/.test(text);
+        }
+
+        // 통합 번역 및 표시 함수
         async function startTranslation() {
-            const titleKr = document.getElementById('titleKr').value;
-            const textKr = document.getElementById('textKr').value;
-            if (!titleKr && !textKr) return;
+            const titleVal = document.getElementById('mainTitleInput').value.trim();
+            const contentVal = document.getElementById('mainContentInput').value.trim();
+
+            if (!titleVal && !contentVal) return;
 
             document.getElementById('loading').style.display = 'flex';
 
             try {
-                // 병렬 처리를 위해 Promise.all 사용 (성능 개선)
-                const requests = [];
-                if (titleKr) {
-                    requests.push(requestTranslation(titleKr).then(res => {
-                        document.getElementById('titleEn').value = res;
+                const tasks = [];
+                
+                // 1. 제목 번역
+                if (titleVal) {
+                    tasks.push(requestTranslation(titleVal).then(translated => {
+                        document.getElementById('displayTranslatedTitle').innerText = translated;
                     }));
                 }
-                if (textKr) {
-                    requests.push(requestTranslation(textKr).then(res => {
-                        document.getElementById('textEn').value = res;
+
+                // 2. 본문 번역 및 배치
+                if (contentVal) {
+                    tasks.push(requestTranslation(contentVal).then(translated => {
+                        const isKrInput = containsKorean(contentVal);
+                        
+                        // 블록 활성화
+                        document.getElementById('blockKr').classList.remove('hidden');
+                        document.getElementById('blockEn').classList.remove('hidden');
+
+                        if (isKrInput) {
+                            // 한글 입력 -> 위: 한글(원본), 아래: 영어(번역)
+                            document.getElementById('displayTextKr').innerText = contentVal;
+                            document.getElementById('displayTextEn').innerText = translated;
+                        } else {
+                            // 영어 입력 -> 위: 영어(원본), 아래: 한글(번역)
+                            document.getElementById('displayTextEn').innerText = contentVal;
+                            document.getElementById('displayTextKr').innerText = translated;
+                            // 시각적 순서 변경 (영어 블록을 위로 보냄)
+                            document.getElementById('blockEn').style.order = "-1";
+                        }
                     }));
                 }
                 
-                await Promise.all(requests);
-            } catch (err) {
-                console.error("Translation execution error:", err);
+                await Promise.all(tasks);
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
 
+        // 이미지 저장
         function saveAsImage() {
+            const inputs = document.querySelectorAll('.no-print');
+            inputs.forEach(el => el.style.display = 'none');
+
             const el = document.getElementById('newspaper');
             html2canvas(el, { 
                 scale: 2, 
-                backgroundColor: "#fdfbf7",
-                useCORS: true, // 이미지 서버 허용 설정
+                backgroundColor: "#f9f7f2",
+                useCORS: true,
                 logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `news_${new Date().getTime()}.png`;
-                link.href = canvas.toDataURL();
+                link.download = `exchange_news_${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL('image/png');
                 link.click();
+                
+                inputs.forEach(el => el.style.display = '');
             });
         }
     </script>
