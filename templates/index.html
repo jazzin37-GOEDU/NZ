@@ -18,24 +18,25 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.15);
             max-width: 900px;
             margin: 40px auto;
-            padding: 50px;
+            padding: 60px;
             border: 1px solid #c1b9a8;
             position: relative;
             color: #1a1a1a;
+            min-height: 1000px;
         }
         /* 헤더 섹션 */
         .newspaper-header {
             text-align: center;
             border-bottom: 5px solid #1a1a1a;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             margin-bottom: 5px;
         }
         .main-title {
             font-family: 'Nanum Myeongjo', serif;
             font-weight: 800;
-            font-size: 2.5rem;
-            letter-spacing: -1px;
-            line-height: 1.2;
+            font-size: 3rem;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
             margin-bottom: 5px;
         }
         .newspaper-meta {
@@ -43,52 +44,65 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #1a1a1a;
-            padding: 8px 5px;
-            font-size: 0.95rem;
+            padding: 10px 5px;
+            font-size: 1rem;
             font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
-        /* 제목 입력 섹션 */
+
+        /* 공통 입력/출력 스타일 */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background-color 0.2s;
+            border-radius: 4px;
+        }
+        [contenteditable="true"]:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+        [contenteditable="true"]:focus {
+            background-color: rgba(255,255,255,0.7);
+            box-shadow: 0 0 0 2px #ddd;
+        }
+        [contenteditable="true"]:empty:before {
+            content: attr(data-placeholder);
+            color: #999;
+            font-weight: 400;
+        }
+
+        /* 제목 섹션 */
         .title-section {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             text-align: center;
         }
-        .headline-input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            text-align: center;
+        #mainTitleInput {
             font-family: 'Nanum Myeongjo', serif;
             font-weight: 800;
-            outline: none;
-            padding-bottom: 10px;
-            font-size: 2.2rem;
-            border-bottom: 1px solid #ccc;
+            font-size: 2.8rem;
+            line-height: 1.2;
+            margin-bottom: 10px;
         }
-        .translated-headline {
-            margin-top: 10px;
+        #displayTranslatedTitle {
             font-family: 'Nanum Myeongjo', serif;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: #444;
             font-style: italic;
-            min-height: 1.8rem;
+            min-height: 2rem;
         }
 
         /* 이미지 섹션 */
         .image-placeholder {
             width: 100%;
-            min-height: 200px;
+            min-height: 250px;
             background-color: #eee;
-            border: 1px solid #ccc;
+            border: 1px dashed #aaa;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             cursor: pointer;
             overflow: hidden;
-            margin-bottom: 30px;
-            transition: all 0.3s ease;
+            margin-bottom: 40px;
         }
         .image-placeholder img {
             width: 100%;
@@ -96,79 +110,63 @@
             display: block;
         }
         
-        /* 본문 영역 스타일 (통합형) */
+        /* 본문 영역 스타일 */
         .article-section {
-            margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-        .content-textarea {
-            width: 100%;
-            min-height: 150px;
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 15px;
-            line-height: 1.6;
-            resize: vertical;
-            font-size: 1rem;
-            outline: none;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .display-content-box {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+            gap: 35px;
         }
         .lang-block {
-            position: relative;
+            display: flex;
+            flex-direction: column;
         }
         .lang-label {
             font-family: 'Nanum Myeongjo', serif;
             font-weight: 800;
-            font-size: 1.1rem;
-            color: #555;
-            border-bottom: 1px solid #1a1a1a;
-            margin-bottom: 10px;
-            display: inline-block;
+            font-size: 1.2rem;
+            color: #1a1a1a;
+            border-bottom: 2px solid #1a1a1a;
+            margin-bottom: 15px;
+            width: fit-content;
             text-transform: uppercase;
+            padding-right: 20px;
         }
-        .article-text {
-            font-size: 1.1rem;
+        .article-content {
+            font-size: 1.15rem;
             line-height: 1.9;
             text-align: justify;
             white-space: pre-wrap;
-            color: #1a1a1a;
+            min-height: 50px;
         }
-        .article-text.english {
-            font-style: normal;
+        .article-content.translated {
+            color: #333;
         }
 
         /* 버튼 및 로딩 */
         .btn-action {
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: 50px;
             font-weight: 800;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .loading-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.9);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 100;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(4px);
         }
         
         @media print {
             .no-print { display: none !important; }
-            .newspaper-container { margin: 0; box-shadow: none; border: none; width: 100%; padding: 30px; }
-            .content-textarea { display: none; }
+            .newspaper-container { margin: 0; box-shadow: none; border: none; width: 100%; padding: 0; }
+            [contenteditable="true"]:empty:before { content: ""; }
         }
     </style>
 </head>
@@ -181,7 +179,7 @@
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-black mx-auto"></div>
                     <p class="mt-4 font-extrabold text-xl">기사를 번역하고 있습니다...</p>
-                    <p class="text-gray-500">Connecting to AI Server</p>
+                    <p class="text-gray-500">Wait a moment while we translate</p>
                 </div>
             </div>
 
@@ -195,71 +193,65 @@
             <div class="newspaper-meta">
                 <div id="currentDate">Vol. 1 - 2026. 04. 14</div>
                 <div class="text-center italic">Friendship Through Education</div>
-                <div class="text-right">경기초등학교 - NZ School</div>
+                <div class="text-right font-bold">경기초등학교 - NZ SCHOOL</div>
             </div>
 
             <!-- 제목 영역 -->
             <div class="title-section">
-                <input type="text" id="mainTitleInput" class="headline-input no-print" placeholder="제목을 입력하세요 / Enter Title Here" />
-                <div id="displayTranslatedTitle" class="translated-headline"></div>
+                <!-- 요청하신 대로 placeholder 수정 -->
+                <div id="mainTitleInput" contenteditable="true" data-placeholder="제목을 입력하세요, Enter Title" class="focus:ring-0"></div>
+                <div id="displayTranslatedTitle" class="italic"></div>
             </div>
 
             <!-- 사진 영역 -->
             <input type="file" id="imageInput" accept="image/*" class="hidden">
             <div class="image-placeholder" id="imageContainer" onclick="document.getElementById('imageInput').click()">
-                <div id="emptyStateText" class="text-center p-10">
-                    <div class="text-5xl mb-3">🖼️</div>
+                <div id="emptyStateText" class="text-center p-10 no-print">
+                    <div class="text-5xl mb-3">📸</div>
                     <p class="font-bold text-gray-500">교류 활동 사진을 추가해 주세요 (클릭)</p>
-                    <p class="text-xs text-gray-400 mt-1">Upload an image of your exchange activity</p>
+                    <p class="text-xs text-gray-400 mt-1">Upload exchange photo here</p>
                 </div>
                 <img id="previewImg" class="hidden">
             </div>
 
-            <!-- 본문 통합 영역 -->
+            <!-- 본문 영역 (인라인 편집) -->
             <div class="article-section">
-                <textarea id="mainContentInput" class="content-textarea no-print" placeholder="기사 내용을 입력하세요 (한글 또는 영어 모두 가능) / Enter article content here..."></textarea>
+                <div class="lang-block">
+                    <div class="lang-label">Original Content</div>
+                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. 한글로 입력하면 아래에 영문이, 영어로 입력하면 아래에 한글이 나타납니다." class="article-content"></div>
+                </div>
                 
-                <div class="display-content-box">
-                    <!-- 한국어 출력 블록 -->
-                    <div id="blockKr" class="lang-block hidden">
-                        <div class="lang-label">Korean Article</div>
-                        <div id="displayTextKr" class="article-text"></div>
-                    </div>
-                    
-                    <!-- 영어 출력 블록 -->
-                    <div id="blockEn" class="lang-block hidden">
-                        <div class="lang-label">English Article</div>
-                        <div id="displayTextEn" class="article-text english"></div>
-                    </div>
+                <div class="lang-block" id="translatedBlock" style="display: none;">
+                    <div class="lang-label" id="translatedLabel">Translated Content</div>
+                    <div id="translatedOutput" class="article-content translated"></div>
                 </div>
             </div>
 
             <!-- 푸터 -->
-            <div class="mt-12 pt-6 border-t-2 border-black flex justify-between items-center text-xs font-bold uppercase tracking-widest">
-                <div>Gyeonggi-NZ Partnership</div>
+            <div class="mt-16 pt-6 border-t-2 border-black flex justify-between items-center text-xs font-bold uppercase tracking-widest">
+                <div>Partnership for Global Citizens</div>
                 <div>Page 01</div>
                 <div>Est. 2026</div>
             </div>
         </div>
 
         <!-- 하단 액션 버튼 -->
-        <div class="flex justify-center gap-4 no-print pb-10">
-            <button onclick="startTranslation()" class="btn-action bg-white border-2 border-black text-black hover:bg-black hover:text-white shadow-lg">
-                <span>🔄</span> 자동 번역 (Auto Translate)
+        <div class="flex flex-col sm:flex-row justify-center gap-6 no-print pb-20 px-4">
+            <button onclick="startTranslation()" class="btn-action bg-white border-2 border-black text-black hover:bg-black hover:text-white shadow-xl w-full sm:w-auto justify-center">
+                <span class="text-xl">🔄</span> 자동번역, Translate
             </button>
-            <button onclick="saveAsImage()" class="btn-action bg-black text-white hover:bg-gray-800 shadow-lg">
-                <span>💾</span> 이미지로 저장하기 (Save Image)
+            <button onclick="saveAsImage()" class="btn-action bg-black text-white hover:bg-gray-800 shadow-xl w-full sm:w-auto justify-center">
+                <span class="text-xl">💾</span> 신문 이미지 저장하기, Save as Image
             </button>
         </div>
     </div>
 
     <script>
-        // 현재 날짜 설정
+        // 날짜 초기화
         const d = new Date();
-        const dateStr = `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}`;
-        document.getElementById('currentDate').innerText = `Vol. 1 - ${dateStr}`;
+        document.getElementById('currentDate').innerText = `Vol. 1 - ${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}`;
 
-        // 사진 업로드 핸들러
+        // 사진 핸들러
         document.getElementById('imageInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -269,16 +261,13 @@
                     img.src = ev.target.result;
                     img.classList.remove('hidden');
                     document.getElementById('emptyStateText').classList.add('hidden');
-                    const container = document.getElementById('imageContainer');
-                    container.style.height = 'auto';
-                    container.style.backgroundColor = 'transparent';
-                    container.style.border = 'none';
+                    document.getElementById('imageContainer').style.border = 'none';
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // 번역 API 호출 함수
+        // 번역 API
         async function requestTranslation(text) {
             try {
                 const response = await fetch("/translate", {
@@ -286,58 +275,51 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: text })
                 });
-                if (!response.ok) throw new Error('Network error');
                 const data = await response.json();
                 return data.translatedText;
             } catch (err) {
-                console.error(err);
-                return "Translation Failed";
+                return "Translation error. Please try again.";
             }
         }
 
-        // 언어 판별 함수 (한글 포함 여부)
         function containsKorean(text) {
             return /[가-힣]/.test(text);
         }
 
-        // 통합 번역 및 표시 함수
+        // 통합 번역 및 배치 로직
         async function startTranslation() {
-            const titleVal = document.getElementById('mainTitleInput').value.trim();
-            const contentVal = document.getElementById('mainContentInput').value.trim();
+            const titleText = document.getElementById('mainTitleInput').innerText.trim();
+            const contentText = document.getElementById('mainContentInput').innerText.trim();
 
-            if (!titleVal && !contentVal) return;
+            if (!titleText && !contentText) return;
 
             document.getElementById('loading').style.display = 'flex';
 
             try {
                 const tasks = [];
                 
-                // 1. 제목 번역
-                if (titleVal) {
-                    tasks.push(requestTranslation(titleVal).then(translated => {
-                        document.getElementById('displayTranslatedTitle').innerText = translated;
+                // 제목 번역
+                if (titleText) {
+                    tasks.push(requestTranslation(titleText).then(res => {
+                        document.getElementById('displayTranslatedTitle').innerText = res;
                     }));
                 }
 
-                // 2. 본문 번역 및 배치
-                if (contentVal) {
-                    tasks.push(requestTranslation(contentVal).then(translated => {
-                        const isKrInput = containsKorean(contentVal);
+                // 본문 번역 및 배치
+                if (contentText) {
+                    tasks.push(requestTranslation(contentText).then(res => {
+                        const outputBlock = document.getElementById('translatedBlock');
+                        const outputText = document.getElementById('translatedOutput');
+                        const label = document.getElementById('translatedLabel');
                         
-                        // 블록 활성화
-                        document.getElementById('blockKr').classList.remove('hidden');
-                        document.getElementById('blockEn').classList.remove('hidden');
-
-                        if (isKrInput) {
-                            // 한글 입력 -> 위: 한글(원본), 아래: 영어(번역)
-                            document.getElementById('displayTextKr').innerText = contentVal;
-                            document.getElementById('displayTextEn').innerText = translated;
+                        outputBlock.style.display = 'flex';
+                        outputText.innerText = res;
+                        
+                        // 언어에 따라 라벨 자동 조정
+                        if (containsKorean(contentText)) {
+                            label.innerText = "English Version";
                         } else {
-                            // 영어 입력 -> 위: 영어(원본), 아래: 한글(번역)
-                            document.getElementById('displayTextEn').innerText = contentVal;
-                            document.getElementById('displayTextKr').innerText = translated;
-                            // 시각적 순서 변경 (영어 블록을 위로 보냄)
-                            document.getElementById('blockEn').style.order = "-1";
+                            label.innerText = "한글 기사";
                         }
                     }));
                 }
@@ -350,22 +332,20 @@
 
         // 이미지 저장
         function saveAsImage() {
-            const inputs = document.querySelectorAll('.no-print');
-            inputs.forEach(el => el.style.display = 'none');
+            const elementsToHide = document.querySelectorAll('.no-print');
+            elementsToHide.forEach(el => el.style.display = 'none');
 
-            const el = document.getElementById('newspaper');
-            html2canvas(el, { 
+            const container = document.getElementById('newspaper');
+            html2canvas(container, { 
                 scale: 2, 
                 backgroundColor: "#f9f7f2",
-                useCORS: true,
-                logging: false
+                useCORS: true 
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `exchange_news_${new Date().getTime()}.png`;
+                link.download = `ExchangeNews_${new Date().getTime()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                
-                inputs.forEach(el => el.style.display = '');
+                elementsToHide.forEach(el => el.style.display = '');
             });
         }
     </script>
