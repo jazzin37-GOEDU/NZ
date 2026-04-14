@@ -15,10 +15,23 @@ def translate_with_deepl(text):
     if not DEEPL_API_KEY:
         return "Error: DeepL API Key is missing. Please set DEEPL_API_KEY in Vercel settings."
 
-    # [로직 개선] 입력 텍스트에 한글이 포함되어 있으면 영어로, 없으면 한국어로 번역하도록 설정
-    # 정규식을 통해 한글 포함 여부를 더 정확히 판단합니다.
+    # [로직 개선] 한국어 입력 -> 영어 번역 / 영어 입력 -> 한국어 번역
+    # 1. 한글이 포함되어 있는지 확인
     has_korean = bool(re.search('[가-힣]', text))
-    target_lang = 'EN-US' if has_korean else 'KO'
+    # 2. 영어 알파벳이 포함되어 있는지 확인
+    has_english = bool(re.search('[a-zA-Z]', text))
+
+    # 로직 결정:
+    # 한글이 포함되어 있으면 한국어로 쓴 것으로 간주 -> 영어(EN-US)로 번역
+    # 한글이 없고 영어가 포함되어 있으면 -> 한국어(KO)로 번역
+    # 둘 다 없거나 모호하면 기본적으로 한국어(KO)로 번역을 시도
+    if has_korean:
+        target_lang = 'EN-US'
+    elif has_english:
+        target_lang = 'KO'
+    else:
+        # 기본값은 한국어 번역으로 설정 (뉴질랜드 학생 배려)
+        target_lang = 'KO'
 
     headers = {
         "Authorization": f"DeepL-Auth-Key {DEEPL_API_KEY}"
@@ -55,7 +68,6 @@ def translate_with_deepl(text):
                     return "Error 456: DeepL API Quota exceeded."
                 
                 else:
-                    # 다른 에러가 발생하면 로그를 남기기 위해 메시지 반환
                     continue
                     
             except Exception as e:
@@ -75,7 +87,6 @@ def handle_translate():
             return jsonify({"error": "No text provided"}), 400
             
         source_text = data.get('text', '')
-        # 텍스트가 비어있는 경우 처리
         if not source_text.strip():
             return jsonify({"translatedText": ""})
 
