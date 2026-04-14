@@ -131,13 +131,6 @@
             margin-top: 5px;
         }
 
-        /* 국기 표시 스타일 */
-        #flagDisplay {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-
         /* 버튼 및 로딩 */
         .btn-action {
             padding: 14px 28px;
@@ -211,10 +204,10 @@
 
             <!-- 본문 영역 (원문 유지 + 번역문 추가 방식) -->
             <div class="article-section">
-                <div id="flagDisplay" class="flex justify-start"></div>
+                <!-- 국기 표시 영역 삭제됨 -->
                 <div class="lang-block">
                     <!-- 원문이 표시될 영역 -->
-                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. 입력 언어에 따라 국기가 표시됩니다." class="article-content"></div>
+                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요." class="article-content"></div>
                     <!-- 번역문이 별도로 표시될 영역 -->
                     <div id="translatedOutput" class="article-content translated-text hidden"></div>
                 </div>
@@ -243,35 +236,6 @@
         // 날짜 초기화
         const d = new Date();
         document.getElementById('currentDate').innerText = `Vol. 1 - ${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}`;
-
-        // 언어 감지 함수
-        function detectLanguage(text) {
-            const koreanPattern = /[가-힣]/;
-            if (koreanPattern.test(text)) return 'ko';
-            const englishPattern = /[a-zA-Z]/;
-            if (englishPattern.test(text)) return 'en';
-            return null;
-        }
-
-        // 국기 업데이트 함수
-        function updateFlag(text) {
-            const flagEl = document.getElementById('flagDisplay');
-            const lang = detectLanguage(text);
-            
-            if (lang === 'ko') {
-                flagEl.innerText = '🇰🇷'; // 태극기
-            } else if (lang === 'en') {
-                flagEl.innerText = '🇳🇿'; // 뉴질랜드 국기
-            } else {
-                flagEl.innerText = '';
-            }
-        }
-
-        // 입력 시 실시간 국기 업데이트
-        document.getElementById('mainContentInput').addEventListener('input', function(e) {
-            updateFlag(e.target.innerText);
-            // 새로운 입력이 들어오면 기존 번역 영역은 초기화하거나 숨길 수 있습니다.
-        });
 
         // 사진 핸들러
         document.getElementById('imageInput').addEventListener('change', function(e) {
