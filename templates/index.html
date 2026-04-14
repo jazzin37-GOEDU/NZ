@@ -116,19 +116,16 @@
             flex-direction: column;
             gap: 20px;
         }
+        .lang-block {
+            display: flex;
+            flex-direction: column;
+        }
         .article-content {
             font-size: 1.15rem;
             line-height: 1.9;
             text-align: justify;
             white-space: pre-wrap;
-            min-height: 50px;
-        }
-        .translated-text {
-            color: #444;
-            font-style: italic;
-            border-top: 1px solid #ddd;
-            padding-top: 15px;
-            margin-top: 5px;
+            min-height: 150px;
         }
 
         /* 버튼 및 로딩 */
@@ -188,6 +185,7 @@
             <!-- 제목 영역 -->
             <div class="title-section">
                 <div id="mainTitleInput" contenteditable="true" data-placeholder="제목을 입력하세요, Enter Title" class="focus:ring-0"></div>
+                <!-- 제목 번역은 아래에 작게 표시되어 디자인적 완성도를 유지합니다 -->
                 <div id="displayTranslatedTitle" class="italic"></div>
             </div>
 
@@ -202,14 +200,10 @@
                 <img id="previewImg" class="hidden">
             </div>
 
-            <!-- 본문 영역 (원문 유지 + 번역문 추가 방식) -->
+            <!-- 본문 영역 (교체 방식) -->
             <div class="article-section">
-                <!-- 국기 표시 영역 삭제됨 -->
                 <div class="lang-block">
-                    <!-- 원문이 표시될 영역 -->
-                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요." class="article-content"></div>
-                    <!-- 번역문이 별도로 표시될 영역 -->
-                    <div id="translatedOutput" class="article-content translated-text hidden"></div>
+                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. '자동번역' 버튼을 누르면 이 내용이 번역된 텍스트로 바뀝니다." class="article-content"></div>
                 </div>
             </div>
 
@@ -268,11 +262,10 @@
             }
         }
 
-        // 통합 번역 및 배치 로직 (원문 유지 + 번역문 추가)
+        // 통합 번역 및 배치 로직 (교체 방식)
         async function startTranslation() {
             const titleInput = document.getElementById('mainTitleInput');
             const contentInput = document.getElementById('mainContentInput');
-            const translatedOutput = document.getElementById('translatedOutput');
             
             const titleText = titleInput.innerText.trim();
             const contentText = contentInput.innerText.trim();
@@ -284,18 +277,17 @@
             try {
                 const tasks = [];
                 
-                // 제목 번역
+                // 제목 번역 (입력창 내용은 그대로 두고 아래 가이드 텍스트만 업데이트하거나 교체 가능)
                 if (titleText) {
                     tasks.push(requestTranslation(titleText).then(res => {
                         document.getElementById('displayTranslatedTitle').innerText = res;
                     }));
                 }
 
-                // 본문 번역 (원문은 그대로 두고 아래에 번역문 표시)
+                // 본문 번역 (기존 내용을 번역된 내용으로 교체)
                 if (contentText) {
                     tasks.push(requestTranslation(contentText).then(res => {
-                        translatedOutput.innerText = res;
-                        translatedOutput.classList.remove('hidden');
+                        contentInput.innerText = res;
                     }));
                 }
                 
