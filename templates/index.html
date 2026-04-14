@@ -56,6 +56,7 @@
             outline: none;
             transition: background-color 0.2s;
             border-radius: 4px;
+            padding: 5px;
         }
         [contenteditable="true"]:hover {
             background-color: rgba(0,0,0,0.03);
@@ -123,7 +124,7 @@
             line-height: 1.9;
             text-align: justify;
             white-space: pre-wrap;
-            min-height: 100px;
+            min-height: 50px;
         }
         /* 번역된 본문 스타일 */
         #displayTranslatedContent {
@@ -174,6 +175,8 @@
             .no-print { display: none !important; }
             .newspaper-container { margin: 0; box-shadow: none; border: none; width: 100%; padding: 0; }
             [contenteditable="true"]:empty:before { content: ""; }
+            /* 인쇄 시 입력창 테두리 제거 */
+            [contenteditable="true"] { background: transparent !important; box-shadow: none !important; }
         }
     </style>
 </head>
@@ -205,9 +208,10 @@
 
             <!-- 제목 영역 -->
             <div class="title-section">
-                <div id="mainTitleInput" contenteditable="true" data-placeholder="제목을 입력하세요, Enter Title" class="focus:ring-0"></div>
-                <!-- 제목 번역 결과 표시 -->
-                <div id="displayTranslatedTitle"></div>
+                <!-- 입력 가능한 제목 영역 -->
+                <div id="mainTitleInput" contenteditable="true" data-placeholder="제목을 입력하세요 (Enter Title)" class="focus:ring-0"></div>
+                <!-- 제목 번역 결과 표시 (기본 숨김) -->
+                <div id="displayTranslatedTitle" class="hidden"></div>
             </div>
 
             <!-- 사진 영역 -->
@@ -223,9 +227,10 @@
 
             <!-- 본문 영역 -->
             <div class="article-section">
-                <!-- 원문 본문 -->
-                <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. '자동번역' 버튼을 누르면 이 내용 아래에 번역본이 생성됩니다." class="article-content"></div>
-                <!-- 번역 본문 결과 표시 -->
+                <!-- 원문 본문 입력창 (수정 가능하며 원문이 유지됨) -->
+                <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. 자동번역을 누르면 이 아래에 번역본이 생성됩니다." class="article-content"></div>
+                
+                <!-- 번역 본문 결과 표시 영역 (번역 시에만 나타남) -->
                 <div id="displayTranslatedContent" class="hidden"></div>
             </div>
 
@@ -292,6 +297,7 @@
                 const data = await response.json();
                 return data.translatedText;
             } catch (err) {
+                console.error(err);
                 return "Translation error. Please try again.";
             }
         }
@@ -300,6 +306,8 @@
         async function startTranslation() {
             const titleInput = document.getElementById('mainTitleInput');
             const contentInput = document.getElementById('mainContentInput');
+            
+            const transTitleArea = document.getElementById('displayTranslatedTitle');
             const transContentArea = document.getElementById('displayTranslatedContent');
             
             const titleText = titleInput.innerText.trim();
@@ -310,24 +318,22 @@
             document.getElementById('loading').style.display = 'flex';
 
             try {
-                const tasks = [];
-                
-                // 제목 번역 (입력창 아래 이탈릭 텍스트 영역에 결과 표시)
+                // 제목 번역
                 if (titleText) {
-                    tasks.push(requestTranslation(titleText).then(res => {
-                        document.getElementById('displayTranslatedTitle').innerText = res;
-                    }));
+                    const resTitle = await requestTranslation(titleText);
+                    transTitleArea.innerText = resTitle;
+                    transTitleArea.classList.remove('hidden');
                 }
 
-                // 본문 번역 (기존 입력창은 그대로 두고, 그 아래 transContentArea에 결과 표시)
+                // 본문 번역
                 if (contentText) {
-                    tasks.push(requestTranslation(contentText).then(res => {
-                        transContentArea.innerText = res;
-                        transContentArea.classList.remove('hidden');
-                    }));
+                    const resContent = await requestTranslation(contentText);
+                    // 기존 contentInput은 건드리지 않고, 별도의 번역 영역에만 결과 노출
+                    transContentArea.innerText = resContent;
+                    transContentArea.classList.remove('hidden');
                 }
-                
-                await Promise.all(tasks);
+            } catch (e) {
+                console.error("Translation Failed", e);
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -338,11 +344,15 @@
             const elementsToHide = document.querySelectorAll('.no-print');
             elementsToHide.forEach(el => el.style.display = 'none');
 
+            // 캡처 시 포커스 제거하여 배경색 원복
+            document.activeElement.blur();
+
             const container = document.getElementById('newspaper');
             html2canvas(container, { 
                 scale: 2, 
                 backgroundColor: "#f9f7f2",
-                useCORS: true 
+                useCORS: true,
+                logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
                 const title = document.getElementById('mainTitleInput').innerText.trim() || 'ExchangeNews';
