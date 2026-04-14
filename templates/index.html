@@ -114,7 +114,7 @@
         .article-section {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 10px;
         }
         .lang-block {
             display: flex;
@@ -126,6 +126,13 @@
             text-align: justify;
             white-space: pre-wrap;
             min-height: 150px;
+        }
+
+        /* 국기 표시 스타일 */
+        #flagDisplay {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
         }
 
         /* 버튼 및 로딩 */
@@ -185,7 +192,6 @@
             <!-- 제목 영역 -->
             <div class="title-section">
                 <div id="mainTitleInput" contenteditable="true" data-placeholder="제목을 입력하세요, Enter Title" class="focus:ring-0"></div>
-                <!-- 제목 번역은 아래에 작게 표시되어 디자인적 완성도를 유지합니다 -->
                 <div id="displayTranslatedTitle" class="italic"></div>
             </div>
 
@@ -200,10 +206,12 @@
                 <img id="previewImg" class="hidden">
             </div>
 
-            <!-- 본문 영역 (교체 방식) -->
+            <!-- 본문 영역 (교체 방식 + 국기 표시) -->
             <div class="article-section">
+                <!-- 국기 표시용 요소 추가 -->
+                <div id="flagDisplay" class="flex justify-start"></div>
                 <div class="lang-block">
-                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. '자동번역' 버튼을 누르면 이 내용이 번역된 텍스트로 바뀝니다." class="article-content"></div>
+                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. 입력 언어에 따라 국기가 표시됩니다." class="article-content"></div>
                 </div>
             </div>
 
@@ -230,6 +238,34 @@
         // 날짜 초기화
         const d = new Date();
         document.getElementById('currentDate').innerText = `Vol. 1 - ${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}`;
+
+        // 언어 감지 함수
+        function detectLanguage(text) {
+            const koreanPattern = /[가-힣]/;
+            if (koreanPattern.test(text)) return 'ko';
+            const englishPattern = /[a-zA-Z]/;
+            if (englishPattern.test(text)) return 'en';
+            return null;
+        }
+
+        // 국기 업데이트 함수
+        function updateFlag(text) {
+            const flagEl = document.getElementById('flagDisplay');
+            const lang = detectLanguage(text);
+            
+            if (lang === 'ko') {
+                flagEl.innerText = '🇰🇷'; // 태극기
+            } else if (lang === 'en') {
+                flagEl.innerText = '🇳🇿'; // 뉴질랜드 국기
+            } else {
+                flagEl.innerText = '';
+            }
+        }
+
+        // 입력 시 실시간 국기 업데이트
+        document.getElementById('mainContentInput').addEventListener('input', function(e) {
+            updateFlag(e.target.innerText);
+        });
 
         // 사진 핸들러
         document.getElementById('imageInput').addEventListener('change', function(e) {
@@ -262,7 +298,7 @@
             }
         }
 
-        // 통합 번역 및 배치 로직 (교체 방식)
+        // 통합 번역 및 배치 로직 (교체 방식 + 국기 동기화)
         async function startTranslation() {
             const titleInput = document.getElementById('mainTitleInput');
             const contentInput = document.getElementById('mainContentInput');
@@ -277,17 +313,19 @@
             try {
                 const tasks = [];
                 
-                // 제목 번역 (입력창 내용은 그대로 두고 아래 가이드 텍스트만 업데이트하거나 교체 가능)
+                // 제목 번역
                 if (titleText) {
                     tasks.push(requestTranslation(titleText).then(res => {
                         document.getElementById('displayTranslatedTitle').innerText = res;
                     }));
                 }
 
-                // 본문 번역 (기존 내용을 번역된 내용으로 교체)
+                // 본문 번역 및 교체
                 if (contentText) {
                     tasks.push(requestTranslation(contentText).then(res => {
                         contentInput.innerText = res;
+                        // 번역된 텍스트의 언어에 맞춰 국기도 업데이트
+                        updateFlag(res);
                     }));
                 }
                 
