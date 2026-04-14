@@ -10,7 +10,7 @@ CORS(app)
 
 # Vercel 프로젝트 설정의 Environment Variables에 DEEPL_API_KEY를 등록하세요.
 # DeepL Free API 키는 보통 끝에 :fx가 붙습니다.
-DEEPL_API_KEY = os.environ.get("DEEPL_API_KEY", "")
+DEEPL_API_KEY = os.environ.get("DEEPL_API_KEY", "b8901e01-7342-4889-a4a2-f4915659778a:fx")
 
 # DeepL API 엔드포인트 (무료 버전은 api-free.deepl.com, 유료 버전은 api.deepl.com 사용)
 DEEPL_URL = "https://api-free.deepl.com/v2/translate"
