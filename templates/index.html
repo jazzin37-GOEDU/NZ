@@ -114,32 +114,18 @@
         .article-section {
             display: flex;
             flex-direction: column;
-            gap: 35px;
+            gap: 20px;
         }
         .lang-block {
             display: flex;
             flex-direction: column;
-        }
-        .lang-label {
-            font-family: 'Nanum Myeongjo', serif;
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: #1a1a1a;
-            border-bottom: 2px solid #1a1a1a;
-            margin-bottom: 15px;
-            width: fit-content;
-            text-transform: uppercase;
-            padding-right: 20px;
         }
         .article-content {
             font-size: 1.15rem;
             line-height: 1.9;
             text-align: justify;
             white-space: pre-wrap;
-            min-height: 50px;
-        }
-        .article-content.translated {
-            color: #333;
+            min-height: 150px;
         }
 
         /* 버튼 및 로딩 */
@@ -198,8 +184,8 @@
 
             <!-- 제목 영역 -->
             <div class="title-section">
-                <!-- 요청하신 대로 placeholder 수정 -->
                 <div id="mainTitleInput" contenteditable="true" data-placeholder="제목을 입력하세요, Enter Title" class="focus:ring-0"></div>
+                <!-- 제목 번역은 아래에 작게 표시되어 디자인적 완성도를 유지합니다 -->
                 <div id="displayTranslatedTitle" class="italic"></div>
             </div>
 
@@ -214,16 +200,10 @@
                 <img id="previewImg" class="hidden">
             </div>
 
-            <!-- 본문 영역 (인라인 편집) -->
+            <!-- 본문 영역 (교체 방식) -->
             <div class="article-section">
                 <div class="lang-block">
-                    <div class="lang-label">Original Content</div>
-                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. 한글로 입력하면 아래에 영문이, 영어로 입력하면 아래에 한글이 나타납니다." class="article-content"></div>
-                </div>
-                
-                <div class="lang-block" id="translatedBlock" style="display: none;">
-                    <div class="lang-label" id="translatedLabel">Translated Content</div>
-                    <div id="translatedOutput" class="article-content translated"></div>
+                    <div id="mainContentInput" contenteditable="true" data-placeholder="기사 내용을 입력하세요. '자동번역' 버튼을 누르면 이 내용이 번역된 텍스트로 바뀝니다." class="article-content"></div>
                 </div>
             </div>
 
@@ -282,14 +262,13 @@
             }
         }
 
-        function containsKorean(text) {
-            return /[가-힣]/.test(text);
-        }
-
-        // 통합 번역 및 배치 로직
+        // 통합 번역 및 배치 로직 (교체 방식)
         async function startTranslation() {
-            const titleText = document.getElementById('mainTitleInput').innerText.trim();
-            const contentText = document.getElementById('mainContentInput').innerText.trim();
+            const titleInput = document.getElementById('mainTitleInput');
+            const contentInput = document.getElementById('mainContentInput');
+            
+            const titleText = titleInput.innerText.trim();
+            const contentText = contentInput.innerText.trim();
 
             if (!titleText && !contentText) return;
 
@@ -298,29 +277,17 @@
             try {
                 const tasks = [];
                 
-                // 제목 번역
+                // 제목 번역 (입력창 내용은 그대로 두고 아래 가이드 텍스트만 업데이트하거나 교체 가능)
                 if (titleText) {
                     tasks.push(requestTranslation(titleText).then(res => {
                         document.getElementById('displayTranslatedTitle').innerText = res;
                     }));
                 }
 
-                // 본문 번역 및 배치
+                // 본문 번역 (기존 내용을 번역된 내용으로 교체)
                 if (contentText) {
                     tasks.push(requestTranslation(contentText).then(res => {
-                        const outputBlock = document.getElementById('translatedBlock');
-                        const outputText = document.getElementById('translatedOutput');
-                        const label = document.getElementById('translatedLabel');
-                        
-                        outputBlock.style.display = 'flex';
-                        outputText.innerText = res;
-                        
-                        // 언어에 따라 라벨 자동 조정
-                        if (containsKorean(contentText)) {
-                            label.innerText = "English Version";
-                        } else {
-                            label.innerText = "한글 기사";
-                        }
+                        contentInput.innerText = res;
                     }));
                 }
                 
